@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0a1628;
+            --navy-mid: #112240;
+            --navy-light: #1a3a5c;
+            --gold: #c9a84c;
+            --gold-light: #e8c97a;
+            --white: #f8f4ee;
+            --grey: #8a9bb0;
+            --error: #c0392b;
+            --success: #27ae60;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--navy);
+            color: var(--white);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(26,58,92,0.6) 0%, transparent 50%);
+        }
+
+        .header {
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            padding: 24px 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+        .header-logo span { color: var(--white); font-weight: 300; }
+        .header-user {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--grey);
+            text-transform: uppercase;
+            display: none;
+        }
+        .header-user.visible { display: block; }
+
+        .page {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        #auth-section .tagline {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            font-weight: 300;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+        #auth-section .tagline em { color: var(--gold); font-style: italic; }
+        #auth-section .subtitle {
+            color: var(--grey);
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-bottom: 48px;
+        }
+
+        .tab-group {
+            display: flex;
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+            margin-bottom: 36px;
+        }
+        .tab {
+            padding: 12px 24px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--grey);
+            cursor: pointer;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            background: none;
+            transition: all 0.2s;
+        }
+        .tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        .field input {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 2px;
+            padding: 14px 16px;
+            color: var(--white);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .field input:focus {
+            border-color: var(--gold);
+            background: rgba(201,168,76,0.05);
+        }
+        .field input::placeholder { color: rgba(138,155,176,0.5); }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--gold);
+            color: var(--navy);
+            border: none;
+            padding: 16px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px;
+            margin-top: 8px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-primary:hover { background: var(--gold-light); }
+        .btn-primary:active { transform: scale(0.99); }
+
+        .result-msg {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--grey);
+            min-height: 18px;
+        }
+        .result-msg.error { color: var(--error); }
+        .result-msg.success { color: var(--success); }
+
+        #main-section { display: none; }
+
+        .welcome-bar {
+            background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 4px;
+            padding: 24px 28px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .welcome-bar .label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+        .welcome-bar .value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+        }
+        .btn-logout {
+            background: none;
+            border: 1px solid rgba(201,168,76,0.3);
+            color: var(--grey);
+            padding: 8px 16px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { border-color: var(--gold); color: var(--gold); }
+
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(201,168,76,0.12);
+            border-radius: 4px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(201,168,76,0.1);
+        }
+
+        .inline-group { display: flex; gap: 12px; }
+        .inline-group .field { flex: 1; }
+        .inline-group .btn-lookup {
+            align-self: flex-end;
+            background: none;
+            border: 1px solid rgba(201,168,76,0.3);
+            color: var(--gold);
+            padding: 14px 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px;
+            white-space: nowrap;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+        .inline-group .btn-lookup:hover { background: rgba(201,168,76,0.1); }
+
+        .result-box {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(201,168,76,0.08);
+            border-radius: 2px;
+            padding: 14px 16px;
+            font-size: 12px;
+            color: var(--grey);
+            white-space: pre-wrap;
+            word-break: break-all;
+            display: none;
+        }
+        .result-box.visible { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-logo">Vault<span>Bank</span></div>
+        <div class="header-user" id="header-user"></div>
+    </div>
+
+    <div class="page" id="auth-section">
+        <p class="tagline">Banking<br>made <em>simple.</em></p>
+        <p class="subtitle">Secure transfers. Real-time balance. No clutter.</p>
+
+        <div class="tab-group">
+            <button class="tab active" onclick="switchTab('register-tab', this)">New Account</button>
+            <button class="tab" onclick="switchTab('login-tab', this)">Sign In</button>
+        </div>
+
+        <div id="register-tab" class="tab-content active">
+            <div class="field">
+                <label>Username</label>
+                <input id="register-username" placeholder="e.g. a_j" autocomplete="off">
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input id="register-password" type="password" placeholder="••••••••">
+            </div>
+            <div class="field">
+                <label>Opening Balance (cents)</label>
+                <input id="acc-balance" type="number" placeholder="e.g. 100000 = $1,000.00">
+            </div>
+            <button class="btn-primary" onclick="register()">Open Account</button>
+            <p class="result-msg" id="register-result"></p>
+        </div>
+
+        <div id="login-tab" class="tab-content">
+            <div class="field">
+                <label>Username</label>
+                <input id="login-username" placeholder="Your username" autocomplete="off">
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input id="login-password" type="password" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" onclick="loginUser()">Sign In</button>
+            <p class="result-msg" id="login-result"></p>
+        </div>
+    </div>
+
+    <div class="page" id="main-section">
+
+        <div class="welcome-bar">
+            <div>
+                <div class="label">Signed in as</div>
+                <div class="value" id="welcome-name"></div>
+            </div>
+            <button class="btn-logout" onclick="logout()">Sign Out</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Account Lookup</div>
+            <div class="inline-group">
+                <div class="field">
+                    <label>Account ID</label>
+                    <input id="view-acc-id" placeholder="Enter account ID">
+                </div>
+                <button class="btn-lookup" onclick="getAccount()">Look Up</button>
+            </div>
+            <div class="result-box" id="view-acc-result"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Send Transfer</div>
+            <div class="field">
+                <label>Recipient Account ID</label>
+                <input id="transfer-receiver" placeholder="Enter recipient ID">
+            </div>
+            <div class="field">
+                <label>Amount (cents)</label>
+                <input id="transfer-amount" type="number" placeholder="e.g. 5000 = $50.00">
+            </div>
+            <button class="btn-primary" onclick="sendTransfer()">Send Transfer</button>
+            <div class="result-box" id="transfer-result" style="margin-top:12px;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Transfer Lookup</div>
+            <div class="inline-group">
+                <div class="field">
+                    <label>Transfer ID</label>
+                    <input id="view-transfer-id" placeholder="Enter transfer ID">
+                </div>
+                <button class="btn-lookup" onclick="getTransfer()">Look Up</button>
+            </div>
+            <div class="result-box" id="view-transfer-result"></div>
+        </div>
+
+    </div>
+
+    <script>
+        let token = null;
+        let currentUser = null;
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function showResult(id, text, isError = false) {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            el.className = 'result-msg' + (isError ? ' error' : ' success');
+        }
+
+        function showBox(id, data) {
+            const el = document.getElementById(id);
+            el.textContent = JSON.stringify(data, null, 2);
+            el.classList.add('visible');
+        }
+
+        function onLoginSuccess(data, username) {
+            token = data.token;
+            currentUser = username;
+            document.getElementById("auth-section").style.display = "none";
+            document.getElementById("main-section").style.display = "block";
+            document.getElementById("welcome-name").textContent = username;
+            document.getElementById("header-user").textContent = username;
+            document.getElementById("header-user").classList.add("visible");
+        }
+
+        function logout() {
+            token = null;
+            currentUser = null;
+            document.getElementById("auth-section").style.display = "block";
+            document.getElementById("main-section").style.display = "none";
+            document.getElementById("header-user").classList.remove("visible");
+        }
+
+        async function register() {
+            const username = document.getElementById("register-username").value;
+            const password = document.getElementById("register-password").value;
+            const balance = parseInt(document.getElementById("acc-balance").value)
+            if (!username || !password || isNaN(balance))
+            {
+                showResult("register-result", "Please fill in all fields", true)
+                return;
+            }
+            const response = await fetch("http://127.0.0.1:5001/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: username,
+                    password: document.getElementById("register-password").value,
+                    balance_cents: parseInt(document.getElementById("acc-balance").value)
+                })
+            });
+            const data = await response.json();
+            if (data.token) {
+                onLoginSuccess(data, username);
+            } else {
+                showResult("register-result", data.error || "Registration failed", true);
+            }
+        }
+
+        async function loginUser() {
+            const username = document.getElementById("login-username").value;
+            const password = document.getElementById("login-passowrd").value
+            if (!username || !password)
+            {
+                showResult("login-result", "Please fill in all fields", true)
+                return;
+            }
+            const response = await fetch("http://127.0.0.1:5001/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: username,
+                    password: document.getElementById("login-password").value
+                })
+            });
+            const data = await response.json();
+            if (data.token) {
+                onLoginSuccess(data, username);
+            } else {
+                showResult("login-result", data.error || "Login failed", true);
+            }
+        }
+
+        async function getAccount() {
+            const id = document.getElementById("view-acc-id").value;
+            const response = await fetch(`http://127.0.0.1:5001/accounts/${id}`, {
+                headers: { "Authorization": token }
+            });
+            const data = await response.json();
+            showBox("view-acc-result", data);
+        }
+
+        async function sendTransfer() {
+            const receiver = document.getElementById("transfer-receiver").value;
+            const amount = parseInt(document.getElementById("transfer-amount").value);
+            if (!receiver || isNaN(amount))
+            {
+                showBox("transder-result", {error: "Please fill in all fields" })
+                return;
+            }
+            const response = await fetch("http://127.0.0.1:5001/transfers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": token },
+                body: JSON.stringify({
+                    idempotency_key: Date.now().toString(),
+                    sender_id: currentUser,
+                    receiver_id: document.getElementById("transfer-receiver").value,
+                    amount_cents: parseInt(document.getElementById("transfer-amount").value)
+                })
+            });
+            const data = await response.json();
+            showBox("transfer-result", data);
+        }
+
+        async function getTransfer() {
+            const id = document.getElementById("view-transfer-id").value;
+            const response = await fetch(`http://127.0.0.1:5001/transfers/${id}`, {
+                headers: { "Authorization": token }
+            });
+            const data = await response.json();
+            showBox("view-transfer-result", data);
+        }
+    </script>
+</body>
+</html>
