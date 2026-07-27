@@ -10,7 +10,7 @@ def log(message):
     now = datetime.datetime.now()
     now_format = now.strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{now_format}] {message}")
-    with open("audit_log.txt", "a") as f:
+    with open("clean_audit_log.txt", "a") as f:
         f.write(f"[{now_format}] {message} \n")
 def test_unauthenticated_access():
     try:
@@ -61,9 +61,13 @@ def scan_open_ports():
     result = subprocess.run(
         ["nmap", "-sV", "127.0.0.1"], 
         capture_output=True, 
-        text=True
+        text=True    
     )
-    log(result.stdout)
+    summary_lines = [line for line in result.stdout.split('\n')
+                     if any(word in line for word in ['open', 'filtered', 'Nmap done', '5001'])]
+    for line in summary_lines:
+        log(f"NMAP: {line}")
+
     if "5001" in result.stdout:
         log("WARNING — Flask server visible on port 5001")
     else:
