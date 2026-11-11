@@ -30,7 +30,7 @@ This included 'security_test.py' script tests:
 - nmap('brew install nmap')
 
 ### Setup
-1. Create and activate a virtual environment: '''bash, python3 -m venv venv
+1. Create and activate a virtual environment: bash python3 -m venv venv
    source venv/bin/activate
 
 2. Install dependencies:
